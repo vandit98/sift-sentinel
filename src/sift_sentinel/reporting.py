@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Dict, Iterable, List
+from typing import Any, Dict, Iterable, List, Optional
 
 from .case import CaseConfig
 from .models import Finding, ToolResult, ValidationIssue
@@ -15,6 +15,7 @@ def generate_triage_report(
     validation_issues: Iterable[ValidationIssue],
     tool_results: Dict[str, ToolResult],
     run_id: str,
+    integrity: Optional[Dict[str, Any]] = None,
 ) -> str:
     findings = list(findings)
     confirmed = [finding for finding in findings if finding.status == "confirmed"]
@@ -31,6 +32,7 @@ def generate_triage_report(
         f"- Confirmed findings: `{len(confirmed)}`",
         f"- Inferred findings: `{len(inferred)}`",
         f"- Refuted leads: `{len(refuted)}`",
+        f"- Evidence integrity: `{_integrity_status(integrity)}`",
         "",
         "## Executive Summary",
         "",
@@ -62,6 +64,25 @@ def generate_triage_report(
             )
     else:
         lines.append("No validation gaps remained at the end of the run.")
+    lines.extend(["", "## Evidence Integrity", ""])
+    if integrity:
+        comparison = integrity.get("comparison", {})
+        if comparison.get("ok"):
+            lines.append("Pre-run and post-run evidence manifests match. No configured evidence artifact changed.")
+        else:
+            lines.append("Evidence integrity check failed. Review changed, missing, and added artifacts before relying on this run.")
+        lines.extend(
+            [
+                "",
+                f"- Before artifacts: `{comparison.get('before_artifact_count', 'unknown')}`",
+                f"- After artifacts: `{comparison.get('after_artifact_count', 'unknown')}`",
+                f"- Changed: `{len(comparison.get('changed', []))}`",
+                f"- Missing: `{len(comparison.get('missing', []))}`",
+                f"- Added: `{len(comparison.get('added', []))}`",
+            ]
+        )
+    else:
+        lines.append("Evidence integrity details were not provided for this report.")
     lines.extend(["", "## Tool Execution Audit", ""])
     for name, result in sorted(tool_results.items()):
         status = "ok" if result.ok else "error"
@@ -72,6 +93,12 @@ def generate_triage_report(
         )
     lines.append("")
     return "\n".join(lines)
+
+
+def _integrity_status(integrity: Optional[Dict[str, Any]]) -> str:
+    if not integrity:
+        return "not checked"
+    return "ok" if integrity.get("comparison", {}).get("ok") else "failed"
 
 
 def _finding_lines(findings: Iterable[Finding]) -> List[str]:
@@ -106,4 +133,3 @@ def _finding_lines(findings: Iterable[Finding]) -> List[str]:
     if not any_finding:
         lines.append("None.")
     return lines
-

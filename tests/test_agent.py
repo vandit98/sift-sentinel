@@ -22,9 +22,10 @@ class AgentLoopTest(unittest.TestCase):
             self.assertEqual(statuses["F-003"], "confirmed")
             self.assertEqual(statuses["F-004"], "confirmed")
             self.assertLessEqual(result.iterations, 3)
+            self.assertTrue(result.integrity["comparison"]["ok"])
             self.assertTrue((result.output_dir / "analysis" / "execution_log.jsonl").exists())
+            self.assertTrue((result.output_dir / "analysis" / "evidence_integrity.json").exists())
 
 
 if __name__ == "__main__":
     unittest.main()
-

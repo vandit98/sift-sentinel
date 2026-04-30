@@ -4,15 +4,16 @@ from __future__ import annotations
 
 import json
 import sys
-from pathlib import Path
 from typing import Any, Callable, Dict, Optional
 
 from .agent import SentinelAgent
 from .case import CaseConfig
-from .evidence import build_manifest
+from .evidence import build_manifest, evidence_integrity_report
 from .policies import EvidencePolicy
 from .scoring import load_ground_truth, score_findings, write_accuracy_artifacts
+from .sift_wrappers import SiftWrappers
 from .tools import SentinelTools
+from .validation import spoliation_check, validate_case
 
 
 JSONDict = Dict[str, Any]
@@ -22,10 +23,19 @@ class SentinelMCPServer:
     def __init__(self) -> None:
         self.tools: Dict[str, Callable[[JSONDict], JSONDict]] = {
             "sift_sentinel_case_manifest": self._case_manifest,
+            "sift_sentinel_validate_case": self._validate_case,
+            "sift_sentinel_integrity_report": self._integrity_report,
+            "sift_sentinel_spoliation_check": self._spoliation_check,
+            "sift_sentinel_tool_contracts": self._tool_contracts,
             "sift_sentinel_run_triage": self._run_triage,
             "sift_sentinel_benchmark": self._benchmark,
             "sift_sentinel_memory_processes": self._memory_processes,
             "sift_sentinel_memory_netstat": self._memory_netstat,
+            "sift_sentinel_memory_malfind": self._memory_malfind,
+            "sift_sentinel_disk_prefetch": self._disk_prefetch,
+            "sift_sentinel_disk_amcache": self._disk_amcache,
+            "sift_sentinel_disk_timeline": self._disk_timeline,
+            "sift_sentinel_windows_events": self._windows_events,
             "sift_sentinel_registry_run_keys": self._registry_run_keys,
         }
 
@@ -95,6 +105,26 @@ class SentinelMCPServer:
                 "inputSchema": case_schema,
             },
             {
+                "name": "sift_sentinel_validate_case",
+                "description": "Validate case configuration, artifact paths, and output/evidence root separation.",
+                "inputSchema": case_schema,
+            },
+            {
+                "name": "sift_sentinel_integrity_report",
+                "description": "Generate the current evidence hash manifest and integrity policy statement.",
+                "inputSchema": case_schema,
+            },
+            {
+                "name": "sift_sentinel_spoliation_check",
+                "description": "Run adversarial policy checks proving writes into evidence paths are denied.",
+                "inputSchema": case_schema,
+            },
+            {
+                "name": "sift_sentinel_tool_contracts",
+                "description": "List typed SIFT wrapper contracts and their security boundaries.",
+                "inputSchema": {"type": "object", "properties": {}},
+            },
+            {
                 "name": "sift_sentinel_run_triage",
                 "description": "Run the autonomous self-correcting triage loop with a hard max iteration cap.",
                 "inputSchema": {
@@ -131,6 +161,31 @@ class SentinelMCPServer:
                 "inputSchema": case_schema,
             },
             {
+                "name": "sift_sentinel_memory_malfind",
+                "description": "Return structured memory malfind rows with executable-region annotations.",
+                "inputSchema": case_schema,
+            },
+            {
+                "name": "sift_sentinel_disk_prefetch",
+                "description": "Return structured Windows Prefetch execution rows.",
+                "inputSchema": case_schema,
+            },
+            {
+                "name": "sift_sentinel_disk_amcache",
+                "description": "Return structured Amcache rows with signing and normalized-path annotations.",
+                "inputSchema": case_schema,
+            },
+            {
+                "name": "sift_sentinel_disk_timeline",
+                "description": "Return structured disk timeline rows.",
+                "inputSchema": case_schema,
+            },
+            {
+                "name": "sift_sentinel_windows_events",
+                "description": "Return structured Windows event rows.",
+                "inputSchema": case_schema,
+            },
+            {
                 "name": "sift_sentinel_registry_run_keys",
                 "description": "Return structured Windows Run key persistence rows.",
                 "inputSchema": case_schema,
@@ -140,6 +195,19 @@ class SentinelMCPServer:
     def _case_manifest(self, args: JSONDict) -> JSONDict:
         case, policy, _tools = _load_tools(args)
         return build_manifest(case, policy)
+
+    def _validate_case(self, args: JSONDict) -> JSONDict:
+        return validate_case(args["case_file"])
+
+    def _integrity_report(self, args: JSONDict) -> JSONDict:
+        case, policy, _tools = _load_tools(args)
+        return evidence_integrity_report(case, policy)
+
+    def _spoliation_check(self, args: JSONDict) -> JSONDict:
+        return spoliation_check(args["case_file"])
+
+    def _tool_contracts(self, _args: JSONDict) -> JSONDict:
+        return SiftWrappers.tool_contracts()
 
     def _run_triage(self, args: JSONDict) -> JSONDict:
         result = SentinelAgent().run(
@@ -168,6 +236,26 @@ class SentinelMCPServer:
     def _memory_netstat(self, args: JSONDict) -> JSONDict:
         _case, _policy, tools = _load_tools(args)
         return tools.memory_netstat().as_dict()
+
+    def _memory_malfind(self, args: JSONDict) -> JSONDict:
+        _case, _policy, tools = _load_tools(args)
+        return tools.memory_malfind().as_dict()
+
+    def _disk_prefetch(self, args: JSONDict) -> JSONDict:
+        _case, _policy, tools = _load_tools(args)
+        return tools.disk_prefetch().as_dict()
+
+    def _disk_amcache(self, args: JSONDict) -> JSONDict:
+        _case, _policy, tools = _load_tools(args)
+        return tools.disk_amcache().as_dict()
+
+    def _disk_timeline(self, args: JSONDict) -> JSONDict:
+        _case, _policy, tools = _load_tools(args)
+        return tools.disk_timeline().as_dict()
+
+    def _windows_events(self, args: JSONDict) -> JSONDict:
+        _case, _policy, tools = _load_tools(args)
+        return tools.windows_events().as_dict()
 
     def _registry_run_keys(self, args: JSONDict) -> JSONDict:
         _case, _policy, tools = _load_tools(args)
@@ -223,4 +311,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

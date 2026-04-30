@@ -2,10 +2,11 @@
 
 - Case ID: `demo-evil-001`
 - Run ID: `demo-run`
-- Generated UTC: `2026-04-30T21:04:29Z`
+- Generated UTC: `2026-04-30T22:36:07Z`
 - Confirmed findings: `3`
 - Inferred findings: `0`
 - Refuted leads: `1`
+- Evidence integrity: `ok`
 
 ## Executive Summary
 
@@ -22,12 +23,12 @@ SIFT Sentinel confirmed malicious execution, memory injection, external command-
 - MITRE: `T1055, T1036, T1071`
 
 Evidence:
-- `memory_netstat` row 2 `remote_ip` = `45.77.89.22` via `memory_netstat-ec049d2484`
-- `memory_processes` row 4 `image_path` = `C:\Users\Public\winupdate.exe` via `memory_processes-7254b57374`
-- `disk_prefetch` row 1 `path` = `C:\Users\Public\winupdate.exe` via `disk_prefetch-b4e0f8c7f8`
-- `memory_malfind` row 1 `protection` = `PAGE_EXECUTE_READWRITE` via `memory_malfind-4b813758f4`
-- `disk_amcache` row 1 `sha1` = `6F1D7B81C0FF1DAA2D7C9CE9E6FAE7D2C2F40111` via `disk_amcache-9710726bbb`
-- `disk_timeline` row 1 `event` = `FileCreate` via `disk_timeline-0e1e8f25f1`
+- `memory_netstat` row 2 `remote_ip` = `45.77.89.22` via `memory_netstat-60837bf2a9`
+- `memory_processes` row 4 `image_path` = `C:\Users\Public\winupdate.exe` via `memory_processes-6a58f786b7`
+- `disk_prefetch` row 1 `path` = `C:\Users\Public\winupdate.exe` via `disk_prefetch-eb70e706d3`
+- `memory_malfind` row 1 `protection` = `PAGE_EXECUTE_READWRITE` via `memory_malfind-16b901137c`
+- `disk_amcache` row 1 `sha1` = `6F1D7B81C0FF1DAA2D7C9CE9E6FAE7D2C2F40111` via `disk_amcache-4f669b16dc`
+- `disk_timeline` row 1 `event` = `FileCreate` via `disk_timeline-679bff87d4`
 
 Notes:
 - `malfind`: Private VAD contains MZ header and shellcode-like strings; not backed by image file
@@ -46,9 +47,9 @@ Notes:
 - MITRE: `T1059.001, T1105`
 
 Evidence:
-- `windows_events` row 1 `command_line` = `powershell.exe -NoP -EncodedCommand SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAKQA7 Start-Process C:\Users\Public\winupdate.exe` via `windows_events-04d33d85db`
-- `memory_processes` row 3 `command_line` = `powershell.exe -NoP -EncodedCommand SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAKQA7 Start-Process C:\Users\Public\winupdate.exe` via `memory_processes-7254b57374`
-- `disk_timeline` row 1 `path` = `C:\Users\Public\winupdate.exe` via `disk_timeline-0e1e8f25f1`
+- `windows_events` row 1 `command_line` = `powershell.exe -NoP -EncodedCommand SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAKQA7 Start-Process C:\Users\Public\winupdate.exe` via `windows_events-387ea5e98e`
+- `memory_processes` row 3 `command_line` = `powershell.exe -NoP -EncodedCommand SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAKQA7 Start-Process C:\Users\Public\winupdate.exe` via `memory_processes-6a58f786b7`
+- `disk_timeline` row 1 `path` = `C:\Users\Public\winupdate.exe` via `disk_timeline-679bff87d4`
 
 Notes:
 - `self_correction`: Confirmed after process and timeline corroboration.
@@ -63,9 +64,9 @@ Notes:
 - MITRE: `T1112, T1218.011, T1547.001`
 
 Evidence:
-- `windows_events` row 2 `command_line` = `rundll32.exe C:\ProgramData\AcmeCache\SyncCache.dll,Start` via `windows_events-04d33d85db`
-- `disk_timeline` row 3 `path` = `C:\ProgramData\AcmeCache\SyncCache.dll` via `disk_timeline-0e1e8f25f1`
-- `registry_run_keys` row 1 `value_data` = `rundll32.exe C:\ProgramData\AcmeCache\SyncCache.dll,Start` via `registry_run_keys-613612de4e`
+- `windows_events` row 2 `command_line` = `rundll32.exe C:\ProgramData\AcmeCache\SyncCache.dll,Start` via `windows_events-387ea5e98e`
+- `disk_timeline` row 3 `path` = `C:\ProgramData\AcmeCache\SyncCache.dll` via `disk_timeline-679bff87d4`
+- `registry_run_keys` row 1 `value_data` = `rundll32.exe C:\ProgramData\AcmeCache\SyncCache.dll,Start` via `registry_run_keys-e5aeb5d4a1`
 
 Notes:
 - `self_correction`: Confirmed only after registry Run key evidence was collected.
@@ -82,7 +83,7 @@ Notes:
 - MITRE: `T1036`
 
 Evidence:
-- `disk_prefetch` row 2 `path` = `C:\Users\Public\svchost.exe` via `disk_prefetch-b4e0f8c7f8`
+- `disk_prefetch` row 2 `path` = `C:\Users\Public\svchost.exe` via `disk_prefetch-eb70e706d3`
 
 Notes:
 - `path`: C:\Users\Public\svchost.exe
@@ -113,14 +114,24 @@ Notes:
 - Reason: Execution is not persistence until an ASEP or service mechanism is proven.
 
 
+## Evidence Integrity
+
+Pre-run and post-run evidence manifests match. No configured evidence artifact changed.
+
+- Before artifacts: `9`
+- After artifacts: `9`
+- Changed: `0`
+- Missing: `0`
+- Added: `0`
+
 ## Tool Execution Audit
 
-- `case_manifest` `case_manifest-e29757092b`: ok; rows=0; started=2026-04-30T21:04:29Z; ended=2026-04-30T21:04:29Z
-- `disk_amcache` `disk_amcache-9710726bbb`: ok; rows=3; started=2026-04-30T21:04:29Z; ended=2026-04-30T21:04:29Z
-- `disk_prefetch` `disk_prefetch-b4e0f8c7f8`: ok; rows=3; started=2026-04-30T21:04:29Z; ended=2026-04-30T21:04:29Z
-- `disk_timeline` `disk_timeline-0e1e8f25f1`: ok; rows=4; started=2026-04-30T21:04:29Z; ended=2026-04-30T21:04:29Z
-- `memory_malfind` `memory_malfind-4b813758f4`: ok; rows=1; started=2026-04-30T21:04:29Z; ended=2026-04-30T21:04:29Z
-- `memory_netstat` `memory_netstat-ec049d2484`: ok; rows=3; started=2026-04-30T21:04:29Z; ended=2026-04-30T21:04:29Z
-- `memory_processes` `memory_processes-7254b57374`: ok; rows=5; started=2026-04-30T21:04:29Z; ended=2026-04-30T21:04:29Z
-- `registry_run_keys` `registry_run_keys-613612de4e`: ok; rows=1; started=2026-04-30T21:04:29Z; ended=2026-04-30T21:04:29Z
-- `windows_events` `windows_events-04d33d85db`: ok; rows=3; started=2026-04-30T21:04:29Z; ended=2026-04-30T21:04:29Z
+- `case_manifest` `case_manifest-39b3fdbddb`: ok; rows=0; started=2026-04-30T22:36:07Z; ended=2026-04-30T22:36:07Z
+- `disk_amcache` `disk_amcache-4f669b16dc`: ok; rows=3; started=2026-04-30T22:36:07Z; ended=2026-04-30T22:36:07Z
+- `disk_prefetch` `disk_prefetch-eb70e706d3`: ok; rows=3; started=2026-04-30T22:36:07Z; ended=2026-04-30T22:36:07Z
+- `disk_timeline` `disk_timeline-679bff87d4`: ok; rows=4; started=2026-04-30T22:36:07Z; ended=2026-04-30T22:36:07Z
+- `memory_malfind` `memory_malfind-16b901137c`: ok; rows=1; started=2026-04-30T22:36:07Z; ended=2026-04-30T22:36:07Z
+- `memory_netstat` `memory_netstat-60837bf2a9`: ok; rows=3; started=2026-04-30T22:36:07Z; ended=2026-04-30T22:36:07Z
+- `memory_processes` `memory_processes-6a58f786b7`: ok; rows=5; started=2026-04-30T22:36:07Z; ended=2026-04-30T22:36:07Z
+- `registry_run_keys` `registry_run_keys-e5aeb5d4a1`: ok; rows=1; started=2026-04-30T22:36:07Z; ended=2026-04-30T22:36:07Z
+- `windows_events` `windows_events-387ea5e98e`: ok; rows=3; started=2026-04-30T22:36:07Z; ended=2026-04-30T22:36:07Z

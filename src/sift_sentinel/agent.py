@@ -4,11 +4,12 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Set
+from typing import Any, Dict, Iterable, List, Optional, Set
 
 from .case import CaseConfig
+from .evidence import build_manifest, compare_manifests
 from .logger import ExecutionLogger
-from .models import EvidenceRef, Finding, ToolResult, ValidationIssue
+from .models import Finding, ToolResult, ValidationIssue
 from .policies import EvidencePolicy
 from .reporting import generate_triage_report
 from .tools import SentinelTools
@@ -24,6 +25,7 @@ class AgentRunResult:
     validation_issues: List[ValidationIssue]
     tool_results: Dict[str, ToolResult]
     iterations: int
+    integrity: Dict[str, Any]
 
     def as_dict(self) -> Dict[str, object]:
         return {
@@ -34,6 +36,7 @@ class AgentRunResult:
             "findings": [finding.as_dict() for finding in self.findings],
             "validation_issues": [issue.as_dict() for issue in self.validation_issues],
             "tool_results": {name: result.as_dict() for name, result in self.tool_results.items()},
+            "integrity": self.integrity,
         }
 
 
@@ -73,7 +76,8 @@ class SentinelAgent:
         logger.event("agent_start", {"case": case.case_id, "max_iterations": max_iterations, "run_id": run_id})
         manifest = tools.case_manifest()
         self._record_tool(logger, state, manifest, iteration=0)
-        write_json(policy.assert_output_path(analysis_dir / "evidence_manifest.json"), manifest.summary)
+        pre_manifest = manifest.summary
+        write_json(policy.assert_output_path(analysis_dir / "evidence_manifest_before.json"), pre_manifest)
 
         completed_iterations = 0
         for iteration in range(1, max_iterations + 1):
@@ -112,6 +116,18 @@ class SentinelAgent:
                 break
 
         findings = list(state.findings.values())
+        post_manifest = build_manifest(case, policy)
+        integrity = {
+            "case_id": case.case_id,
+            "run_id": run_id,
+            "checked_at": utc_now(),
+            "comparison": compare_manifests(pre_manifest, post_manifest),
+            "before_manifest_path": str(analysis_dir / "evidence_manifest_before.json"),
+            "after_manifest_path": str(analysis_dir / "evidence_manifest_after.json"),
+        }
+        write_json(policy.assert_output_path(analysis_dir / "evidence_manifest_after.json"), post_manifest)
+        write_json(policy.assert_output_path(analysis_dir / "evidence_integrity.json"), integrity)
+        logger.event("evidence_integrity", integrity)
         write_json(policy.assert_output_path(reports_dir / "findings.json"), [finding.as_dict() for finding in findings])
         write_json(
             policy.assert_output_path(analysis_dir / "progress.json"),
@@ -121,14 +137,16 @@ class SentinelAgent:
                 "iterations": completed_iterations,
                 "remaining_requested_tools": sorted(state.requested_tools),
                 "final_statuses": {fid: finding.status for fid, finding in state.findings.items()},
+                "evidence_integrity_ok": integrity["comparison"]["ok"],
             },
         )
-        report = generate_triage_report(case, findings, state.validation_issues, state.tool_results, run_id)
+        report = generate_triage_report(case, findings, state.validation_issues, state.tool_results, run_id, integrity)
         (reports_dir / "triage_report.md").write_text(report, encoding="utf-8")
         logger.event(
             "agent_complete",
             {
                 "iterations": completed_iterations,
+                "evidence_integrity_ok": integrity["comparison"]["ok"],
                 "findings": [finding.as_dict() for finding in findings],
                 "report": str(reports_dir / "triage_report.md"),
             },
@@ -142,6 +160,7 @@ class SentinelAgent:
             validation_issues=state.validation_issues,
             tool_results=state.tool_results,
             iterations=completed_iterations,
+            integrity=integrity,
         )
 
     def _call_tool(self, tools: SentinelTools, tool_name: str) -> ToolResult:

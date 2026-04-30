@@ -35,6 +35,7 @@ class SafeSubprocessRunner:
         *,
         read_paths: Optional[Iterable[Path]] = None,
         write_paths: Optional[Iterable[Path]] = None,
+        stdout_path: Optional[Path] = None,
         env: Optional[Dict[str, str]] = None,
     ) -> CommandResult:
         if not argv:
@@ -44,9 +45,11 @@ class SafeSubprocessRunner:
             raise PolicyViolation(f"Binary is not in the SIFT Sentinel allowlist: {argv[0]}")
 
         for path in read_paths or []:
-            self.policy.assert_readable_evidence(path)
+            self.policy.assert_readable_evidence_path(path)
         for path in write_paths or []:
             self.policy.assert_output_path(path)
+        if stdout_path is not None:
+            self.policy.assert_output_path(stdout_path)
 
         completed = subprocess.run(
             argv,
@@ -56,10 +59,12 @@ class SafeSubprocessRunner:
             timeout=self.timeout_seconds,
             env=env,
         )
+        if stdout_path is not None:
+            stdout_path.parent.mkdir(parents=True, exist_ok=True)
+            stdout_path.write_text(completed.stdout, encoding="utf-8")
         return CommandResult(
             argv=argv,
             returncode=completed.returncode,
             stdout=completed.stdout,
             stderr=completed.stderr,
         )
-

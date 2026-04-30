@@ -46,7 +46,9 @@ PYTHONPATH=src python3 -m sift_sentinel benchmark \
 Outputs:
 
 - `cases/demo-case/outputs/demo-benchmark/analysis/execution_log.jsonl`
+- `cases/demo-case/outputs/demo-benchmark/analysis/evidence_integrity.json`
+- `cases/demo-case/outputs/demo-benchmark/analysis/evidence_manifest_before.json`
+- `cases/demo-case/outputs/demo-benchmark/analysis/evidence_manifest_after.json`
 - `cases/demo-case/outputs/demo-benchmark/reports/findings.json`
 - `cases/demo-case/outputs/demo-benchmark/reports/triage_report.md`
 - `cases/demo-case/outputs/demo-benchmark/reports/accuracy_report.md`
-

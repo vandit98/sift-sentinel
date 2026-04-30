@@ -15,42 +15,42 @@
         "artifact": "memory_netstat",
         "field": "remote_ip",
         "row": 2,
-        "tool_call_id": "memory_netstat-cc2bab78bb",
+        "tool_call_id": "memory_netstat-04c13142bb",
         "value": "45.77.89.22"
       },
       {
         "artifact": "memory_processes",
         "field": "image_path",
         "row": 4,
-        "tool_call_id": "memory_processes-d81b675261",
+        "tool_call_id": "memory_processes-ac4e76654e",
         "value": "C:\\Users\\Public\\winupdate.exe"
       },
       {
         "artifact": "disk_prefetch",
         "field": "path",
         "row": 1,
-        "tool_call_id": "disk_prefetch-b1984d6eb3",
+        "tool_call_id": "disk_prefetch-06ba450501",
         "value": "C:\\Users\\Public\\winupdate.exe"
       },
       {
         "artifact": "memory_malfind",
         "field": "protection",
         "row": 1,
-        "tool_call_id": "memory_malfind-c60e3d0c60",
+        "tool_call_id": "memory_malfind-181d7a5a57",
         "value": "PAGE_EXECUTE_READWRITE"
       },
       {
         "artifact": "disk_amcache",
         "field": "sha1",
         "row": 1,
-        "tool_call_id": "disk_amcache-8eeb7a968c",
+        "tool_call_id": "disk_amcache-a154eeef07",
         "value": "6F1D7B81C0FF1DAA2D7C9CE9E6FAE7D2C2F40111"
       },
       {
         "artifact": "disk_timeline",
         "field": "event",
         "row": 1,
-        "tool_call_id": "disk_timeline-54a6e08249",
+        "tool_call_id": "disk_timeline-1d6aa8f234",
         "value": "FileCreate"
       }
     ],
@@ -80,7 +80,7 @@
         "artifact": "disk_prefetch",
         "field": "path",
         "row": 2,
-        "tool_call_id": "disk_prefetch-b1984d6eb3",
+        "tool_call_id": "disk_prefetch-06ba450501",
         "value": "C:\\Users\\Public\\svchost.exe"
       }
     ],
@@ -106,21 +106,21 @@
         "artifact": "windows_events",
         "field": "command_line",
         "row": 1,
-        "tool_call_id": "windows_events-632c4d9a77",
+        "tool_call_id": "windows_events-63e32b26a0",
         "value": "powershell.exe -NoP -EncodedCommand SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAKQA7 Start-Process C:\\Users\\Public\\winupdate.exe"
       },
       {
         "artifact": "memory_processes",
         "field": "command_line",
         "row": 3,
-        "tool_call_id": "memory_processes-d81b675261",
+        "tool_call_id": "memory_processes-ac4e76654e",
         "value": "powershell.exe -NoP -EncodedCommand SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAKQA7 Start-Process C:\\Users\\Public\\winupdate.exe"
       },
       {
         "artifact": "disk_timeline",
         "field": "path",
         "row": 1,
-        "tool_call_id": "disk_timeline-54a6e08249",
+        "tool_call_id": "disk_timeline-1d6aa8f234",
         "value": "C:\\Users\\Public\\winupdate.exe"
       }
     ],
@@ -148,21 +148,21 @@
         "artifact": "windows_events",
         "field": "command_line",
         "row": 2,
-        "tool_call_id": "windows_events-632c4d9a77",
+        "tool_call_id": "windows_events-63e32b26a0",
         "value": "rundll32.exe C:\\ProgramData\\AcmeCache\\SyncCache.dll,Start"
       },
       {
         "artifact": "disk_timeline",
         "field": "path",
         "row": 3,
-        "tool_call_id": "disk_timeline-54a6e08249",
+        "tool_call_id": "disk_timeline-1d6aa8f234",
         "value": "C:\\ProgramData\\AcmeCache\\SyncCache.dll"
       },
       {
         "artifact": "registry_run_keys",
         "field": "value_data",
         "row": 1,
-        "tool_call_id": "registry_run_keys-2276a79cd4",
+        "tool_call_id": "registry_run_keys-9473f7c59e",
         "value": "rundll32.exe C:\\ProgramData\\AcmeCache\\SyncCache.dll,Start"
       }
     ],

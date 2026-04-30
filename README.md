@@ -12,6 +12,7 @@ Protocol SIFT gives Claude Code strong DFIR instructions and tool knowledge. SIF
 - Every forensic operation is a typed tool with structured input and output.
 - Evidence paths are read-only by policy, not by prompt.
 - Generated files can only be written below the case `outputs/` directory.
+- Evidence hashes are compared before and after each autonomous run.
 - Findings must survive a validation pass before becoming confirmed.
 - Every finding cites row-level evidence and the tool call ID that produced it.
 - The benchmark scores false positives, missed truth items, and hallucinated confirmed claims.
@@ -78,6 +79,16 @@ PYTHONPATH=src python3 -m sift_sentinel tool \
   memory_netstat
 ```
 
+Validate a case and prove the evidence write boundary:
+
+```bash
+PYTHONPATH=src python3 -m sift_sentinel validate \
+  --case cases/demo-case/case.json
+
+PYTHONPATH=src python3 -m sift_sentinel spoliation-test \
+  --case cases/demo-case/case.json
+```
+
 Run the MCP server over stdio:
 
 ```bash
@@ -98,6 +109,7 @@ The demo intentionally includes a trap: `C:\Users\Public\svchost.exe` appears in
 Generated sample artifacts are under:
 
 - `cases/demo-case/outputs/demo-run/analysis/execution_log.jsonl`
+- `cases/demo-case/outputs/demo-run/analysis/evidence_integrity.json`
 - `cases/demo-case/outputs/demo-run/reports/triage_report.md`
 - `cases/demo-case/outputs/demo-benchmark/reports/accuracy_report.md`
 
@@ -111,6 +123,7 @@ Generated sample artifacts are under:
 - [Demo video script](docs/DEMO_SCRIPT.md)
 - [Research notes](docs/RESEARCH.md)
 - [Submission checklist](docs/SUBMISSION_CHECKLIST.md)
+- [Claude Code MCP example](integrations/claude-code/mcp.example.json)
 
 ## SIFT Workstation Integration
 
@@ -118,6 +131,12 @@ The demo runs anywhere with Python, but the same policy layer supports SIFT tool
 
 - `volatility_json`: allowlisted Volatility 3 plugins only
 - `evtxecmd_csv`: read-only event logs, CSV output below case outputs
+- `mftecmd_csv`: read-only `$MFT` or `$J`, CSV output below case outputs
+- `pecmd_csv`: read-only Prefetch directory, CSV output below case outputs
+- `amcacheparser_csv`: read-only Amcache hive, CSV output below case outputs
+- `recmd_batch_csv`: read-only registry hives with approved batch files only
+- `yara_scan`: read-only rules and evidence artifacts, captured output only
+- `sleuthkit_fls`: read-only filesystem listing with non-negative offsets
 - `SafeSubprocessRunner`: no `shell=True`, no arbitrary commands, read and write paths checked before execution
 
 This makes the system usable on the SANS SIFT Workstation while preserving the evidence-safety boundary judges are looking for.
@@ -129,4 +148,3 @@ PYTHONPATH=src python3 -m unittest discover -s tests -v
 ```
 
 Current local result: 5 tests passing.
-

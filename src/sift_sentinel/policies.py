@@ -39,6 +39,14 @@ class EvidencePolicy:
             raise PolicyViolation(f"Evidence artifact is not a file: {resolved}")
         return resolved
 
+    def assert_readable_evidence_path(self, path: Path) -> Path:
+        resolved = path.resolve()
+        if not self._is_within(resolved, self.evidence_root):
+            raise PolicyViolation(f"Read denied outside evidence root: {resolved}")
+        if not resolved.exists():
+            raise PolicyViolation(f"Evidence path does not exist: {resolved}")
+        return resolved
+
     def assert_readable_case_file(self, path: Path) -> Path:
         resolved = path.resolve()
         if not self._is_within(resolved, self.case_dir):
@@ -67,4 +75,3 @@ class EvidencePolicy:
             return True
         except ValueError:
             return False
-

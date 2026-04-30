@@ -21,6 +21,19 @@ Open:
 - `cases/demo-case/outputs/judge-demo/reports/triage_report.md`
 - `cases/demo-case/outputs/judge-demo/reports/accuracy_report.md`
 - `cases/demo-case/outputs/judge-demo/analysis/execution_log.jsonl`
+- `cases/demo-case/outputs/judge-demo/analysis/evidence_integrity.json`
+
+Run guardrail checks:
+
+```bash
+PYTHONPATH=src python3 -m sift_sentinel validate \
+  --case cases/demo-case/case.json
+
+PYTHONPATH=src python3 -m sift_sentinel spoliation-test \
+  --case cases/demo-case/case.json
+
+PYTHONPATH=src python3 -m sift_sentinel contracts
+```
 
 ## MCP Server
 
@@ -46,6 +59,8 @@ Claude Desktop-style configuration example:
 }
 ```
 
+A ready-to-edit copy is in `integrations/claude-code/mcp.example.json`.
+
 ## SIFT Workstation
 
 On SIFT:
@@ -56,5 +71,4 @@ On SIFT:
 4. Create a `case.json` that maps artifact names to parsed SIFT outputs.
 5. Run the benchmark command above.
 
-For raw images, extend `sift_sentinel.sift_wrappers` with the relevant typed wrapper. The existing wrappers show the pattern for Volatility 3 and EvtxECmd.
-
+For raw images, use or extend `sift_sentinel.sift_wrappers`. The current contracts cover Volatility 3, EvtxECmd, MFTECmd, PECmd, AmcacheParser, RECmd, YARA, and Sleuth Kit `fls`.

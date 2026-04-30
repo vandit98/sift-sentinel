@@ -30,6 +30,18 @@ class EvidencePolicyTest(unittest.TestCase):
             expected = (outputs / "analysis" / "log.jsonl").resolve()
             self.assertEqual(policy.assert_output_path(outputs / "analysis" / "log.jsonl"), expected)
 
+    def test_allows_readable_evidence_directories(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            evidence = root / "evidence"
+            outputs = root / "outputs"
+            artifact_dir = evidence / "evtx"
+            artifact_dir.mkdir(parents=True)
+            outputs.mkdir()
+            policy = EvidencePolicy(root, evidence, outputs)
+
+            self.assertEqual(policy.assert_readable_evidence_path(artifact_dir), artifact_dir.resolve())
+
 
 if __name__ == "__main__":
     unittest.main()

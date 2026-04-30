@@ -12,6 +12,7 @@ SIFT Sentinel uses the challenge's **Custom MCP Server** pattern as the primary 
 - `sift_sentinel.policies`: evidence integrity guardrail.
 - `sift_sentinel.runners`: safe subprocess runner for real SIFT tools.
 - `sift_sentinel.sift_wrappers`: narrow Volatility and EvtxECmd wrappers.
+- `sift_sentinel.validation`: case validation and spoliation checks.
 - `sift_sentinel.scoring`: accuracy and hallucination benchmark.
 
 ## Trust Boundaries
@@ -20,6 +21,7 @@ SIFT Sentinel uses the challenge's **Custom MCP Server** pattern as the primary 
 |---|---|---|
 | Evidence root is read-only | `EvidencePolicy.assert_readable_evidence` and `assert_output_path` | Architectural |
 | Output root is the only write target | `EvidencePolicy.assert_output_path` | Architectural |
+| Evidence changes are detected | pre-run and post-run hash manifests | Architectural |
 | No arbitrary command execution | MCP server exposes typed tools only | Architectural |
 | SIFT subprocesses use argv arrays | `SafeSubprocessRunner`, `shell=False` | Architectural |
 | Volatility plugin choices are allowlisted | `VOLATILITY_PLUGINS` | Architectural |
@@ -51,7 +53,7 @@ sequenceDiagram
     Agent->>Tools: run missing tools
     Tools-->>Agent: corroborating evidence
     Agent->>Agent: confirm or refute findings
-    Agent->>Out: findings.json, triage_report.md, execution_log.jsonl
+    Agent->>Out: findings.json, triage_report.md, execution_log.jsonl, evidence_integrity.json
     MCP-->>Host: structured run result
 ```
 
@@ -79,3 +81,17 @@ Iteration 2 updates the findings:
 
 The full trace is in `cases/demo-case/outputs/demo-run/analysis/execution_log.jsonl`.
 
+## SIFT Wrapper Coverage
+
+SIFT Sentinel now declares typed contracts for the core artifact families judges care about:
+
+| Wrapper | SIFT family | Boundary |
+|---|---|---|
+| `volatility_json` | Memory | Allowlisted Volatility 3 plugins, JSON renderer |
+| `evtxecmd_csv` | Event logs | Read-only EVTX directory, CSV output only |
+| `mftecmd_csv` | NTFS timeline | Read-only `$MFT` or `$J`, CSV output only |
+| `pecmd_csv` | Execution evidence | Read-only Prefetch directory, CSV output only |
+| `amcacheparser_csv` | Binary provenance | Read-only Amcache hive, CSV output only |
+| `recmd_batch_csv` | Registry | Read-only hive directory, approved batch files only |
+| `yara_scan` | Threat hunting | Read-only rules and evidence artifacts |
+| `sleuthkit_fls` | Filesystem | Read-only image listing, non-negative offsets |

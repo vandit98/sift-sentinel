@@ -6,6 +6,8 @@ SIFT Sentinel makes Protocol SIFT safer and more autonomous by putting a typed M
 
 The agent runs a triage loop, creates initial hypotheses, validates its own gaps, runs the missing tools, and revises findings. It can confirm malicious behavior, refute weak leads, and produce a report where every claim maps back to a specific tool call and evidence row.
 
+It also hashes every configured evidence artifact before and after each run, then writes an evidence integrity report. That gives judges a direct answer to the spoliation question: did the autonomous agent change the evidence?
+
 ## How We Built It
 
 The project is a standard-library Python package with four main layers:
@@ -14,6 +16,7 @@ The project is a standard-library Python package with four main layers:
 - An evidence policy that enforces read-only evidence and output-only writes.
 - Typed forensic tools that return structured rows instead of raw terminal dumps.
 - A deterministic self-correction loop with JSONL execution logs and benchmark scoring.
+- A spoliation-test command that proves evidence writes are denied by code.
 
 The demo case is synthetic and redistributable, but shaped like parsed SIFT outputs: memory process rows, netstat rows, malfind rows, Prefetch, Amcache, event logs, timeline, and registry Run keys.
 
@@ -36,4 +39,3 @@ We also learned that self-correction should be logged as a first-class artifact.
 - Add multi-source correlation for memory plus disk plus PCAP in the same case.
 - Package a Claude Code and OpenClaw MCP configuration.
 - Add a small web UI for live progress, findings, and evidence drilldown.
-

@@ -1,5 +1,6 @@
 {
   "case_id": "demo-evil-001",
+  "evidence_integrity_ok": true,
   "final_statuses": {
     "F-001": "confirmed",
     "F-002": "refuted",

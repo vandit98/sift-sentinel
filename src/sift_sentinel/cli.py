@@ -9,12 +9,14 @@ from typing import Optional
 
 from .agent import SentinelAgent
 from .case import CaseConfig
-from .evidence import build_manifest
+from .evidence import build_manifest, evidence_integrity_report
 from .mcp_server import SentinelMCPServer
 from .policies import EvidencePolicy
 from .scoring import load_ground_truth, score_findings, write_accuracy_artifacts
+from .sift_wrappers import SiftWrappers
 from .tools import SentinelTools
 from .utils import write_json
+from .validation import spoliation_check, validate_case
 
 
 def main(argv: Optional[list[str]] = None) -> None:
@@ -33,6 +35,17 @@ def main(argv: Optional[list[str]] = None) -> None:
 
     manifest_parser = sub.add_parser("manifest", help="Hash and inventory evidence")
     manifest_parser.add_argument("--case", required=True, help="Path to case.json")
+
+    validate_parser = sub.add_parser("validate", help="Validate case configuration and artifact paths")
+    validate_parser.add_argument("--case", required=True, help="Path to case.json")
+
+    integrity_parser = sub.add_parser("integrity", help="Generate current evidence integrity report")
+    integrity_parser.add_argument("--case", required=True, help="Path to case.json")
+
+    spoliation_parser = sub.add_parser("spoliation-test", help="Run policy checks that prove evidence writes are denied")
+    spoliation_parser.add_argument("--case", required=True, help="Path to case.json")
+
+    sub.add_parser("contracts", help="List typed SIFT wrapper contracts")
 
     tool_parser = sub.add_parser("tool", help="Run a typed read-only tool")
     tool_parser.add_argument("--case", required=True, help="Path to case.json")
@@ -58,6 +71,16 @@ def main(argv: Optional[list[str]] = None) -> None:
         output_path = policy.assert_output_path(case.output_root / "latest-manifest.json")
         write_json(output_path, manifest)
         print(json.dumps({"manifest": manifest, "written": str(output_path)}, indent=2, sort_keys=True))
+    elif args.command == "validate":
+        print(json.dumps(validate_case(args.case), indent=2, sort_keys=True))
+    elif args.command == "integrity":
+        case = CaseConfig.load(args.case)
+        policy = EvidencePolicy(case.case_dir, case.evidence_root, case.output_root)
+        print(json.dumps(evidence_integrity_report(case, policy), indent=2, sort_keys=True))
+    elif args.command == "spoliation-test":
+        print(json.dumps(spoliation_check(args.case), indent=2, sort_keys=True))
+    elif args.command == "contracts":
+        print(json.dumps(SiftWrappers.tool_contracts(), indent=2, sort_keys=True))
     elif args.command == "tool":
         case = CaseConfig.load(args.case)
         policy = EvidencePolicy(case.case_dir, case.evidence_root, case.output_root)
@@ -72,4 +95,3 @@ def main(argv: Optional[list[str]] = None) -> None:
 
 if __name__ == "__main__":
     main()
-

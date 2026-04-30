@@ -23,7 +23,17 @@ PYTHONPATH=src python3 -m sift_sentinel benchmark \
 
 Show the benchmark JSON: precision, recall, F1, hallucination count.
 
-## 2:15 - 3:30 Self-Correction
+## 2:15 - 2:45 Evidence Integrity
+
+Open:
+
+```bash
+cat cases/demo-case/outputs/video-demo/analysis/evidence_integrity.json
+```
+
+Narrate: "The agent hashes evidence before and after the run. The hashes match, so the autonomous loop did not modify configured evidence."
+
+## 2:45 - 3:45 Self-Correction
 
 Open:
 
@@ -39,7 +49,7 @@ Narrate:
 - Iteration 2 confirms real malicious activity.
 - The Prefetch-only `svchost.exe` lead is refuted.
 
-## 3:30 - 4:30 Evidence Trail
+## 3:45 - 4:30 Evidence Trail
 
 Open `reports/triage_report.md`.
 
@@ -53,4 +63,3 @@ Point to row-level evidence references:
 ## 4:30 - 5:00 Why It Matters
 
 "This is not just a better prompt. It is a safer execution boundary, a self-correcting analyst loop, and a benchmark that makes hallucinations visible."
-
