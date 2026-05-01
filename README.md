@@ -123,16 +123,14 @@ Generated sample artifacts are under:
 - `cases/demo-case/outputs/demo-run/reports/triage_report.md`
 - `cases/demo-case/outputs/demo-benchmark/reports/accuracy_report.md`
 
-## Submission Docs
+## Judge Docs
 
-- [Devpost story](docs/DEVPOST_STORY.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Dataset documentation](docs/DATASET.md)
 - [Accuracy report](docs/ACCURACY_REPORT.md)
 - [Try-it-out instructions](docs/TRY_IT_OUT.md)
 - [Demo video script](docs/DEMO_SCRIPT.md)
 - [Research notes](docs/RESEARCH.md)
-- [Submission checklist](docs/SUBMISSION_CHECKLIST.md)
 - [Claude Code MCP example](integrations/claude-code/mcp.example.json)
 
 ## SIFT Workstation Integration

@@ -10,3 +10,8 @@ build/
 dist/
 .DS_Store
 
+# Local Devpost submission materials.
+docs/DEVPOST_STORY.md
+docs/VIDEO_SUBMISSION_SCRIPT.md
+media/devpost-*.png
+scripts/create_devpost_media.py
