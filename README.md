@@ -2,11 +2,11 @@
 
 Evidence-safe autonomous DFIR for Protocol SIFT.
 
-SIFT Sentinel turns the Find Evil challenge into a concrete, judge-runnable system: a custom MCP server, a deterministic self-correcting triage agent, structured execution logs, and an accuracy benchmark. The design goal is simple: let an AI defender move fast without letting it mutate evidence or make unsupported claims.
+SIFT Sentinel is a concrete, judge-runnable system: a custom MCP server, a deterministic self-correcting triage agent, structured execution logs, and an accuracy benchmark. The design goal is simple: let an AI defender move fast without letting it mutate evidence or make unsupported claims.
 
-## Why This Can Win
+## Overview
 
-Protocol SIFT gives Claude Code strong DFIR instructions and tool knowledge. SIFT Sentinel adds the missing architectural enforcement layer:
+Protocol SIFT gives Claude Code DFIR instructions and tool knowledge. SIFT Sentinel adds an architectural enforcement layer:
 
 - No generic shell tool is exposed to the agent.
 - Every forensic operation is a typed tool with structured input and output.
@@ -38,6 +38,16 @@ flowchart LR
 ```
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for trust boundaries and tool contracts.
+
+## Project Page
+
+This repo includes a Vercel-ready static project page at [index.html](index.html).
+
+Deploy from the Vercel dashboard by importing:
+
+```text
+https://github.com/vandit98/sift-sentinel
+```
 
 ## Quick Start
 
@@ -147,4 +157,4 @@ This makes the system usable on the SANS SIFT Workstation while preserving the e
 PYTHONPATH=src python3 -m unittest discover -s tests -v
 ```
 
-Current local result: 5 tests passing.
+Current local result: 9 tests passing.
